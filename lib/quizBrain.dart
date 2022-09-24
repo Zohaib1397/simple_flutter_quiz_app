@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:quiz_app/question.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 class QuizBrain {
   int _currentQuestion = 0;
@@ -11,17 +9,22 @@ class QuizBrain {
     Question('I have a Potato friend named Osama', true),
   ];
 
-  void checkNumber(BuildContext context) {
+  void checkNumber() {
     if (_currentQuestion < _questionBank.length - 1) {
       _currentQuestion++;
-    } else {
-      Alert(
-        context: context,
-        title: 'Quiz Completed',
-        desc: 'You have successfully completed the quiz',
-      ).show();
-      _currentQuestion = 0;
     }
+  }
+
+  bool isFinished() {
+    if (_currentQuestion >= _questionBank.length - 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void reset() {
+    _currentQuestion = 0;
   }
 
   String getQuizQuestion() => _questionBank[_currentQuestion].question;

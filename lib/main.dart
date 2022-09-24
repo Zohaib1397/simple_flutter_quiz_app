@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:quiz_app/quizBrain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBank = QuizBrain();
 
 void main() {
-  runApp(quiz_home());
+  runApp(const MaterialApp(home: quiz_home()));
 }
 
 class quiz_home extends StatefulWidget {
@@ -58,59 +61,97 @@ class _quiz_homeState extends State<quiz_home> {
 
   List<Widget> recordKeeper = [];
 
+  void checkAnswer(bool userAnswer) {
+    bool correctAnswer = quizBank.getQuizAnswer();
+    setState(() {
+      if (userAnswer == correctAnswer) {
+        answerSheetIcon(Icons.check, Colors.green);
+      } else {
+        answerSheetIcon(Icons.close, Colors.red);
+      }
+      if (quizBank.isFinished()) {
+        Alert(
+          context: context,
+          type: AlertType.success,
+          title: 'Quiz Finished',
+          desc: 'You have Successfully made it to end :)',
+          buttons: [
+            DialogButton(
+              onPressed: () {
+                setState(() {
+                  quizBank.reset();
+                  recordKeeper = [];
+                  return Navigator.pop(context);
+                });
+              },
+              width: 120.0,
+              child: const Text('Restart',
+                  style: TextStyle(
+                    color: Colors.white,
+                  )),
+            ),
+            DialogButton(
+              color: Colors.red,
+              onPressed: () {
+                setState(() {
+                  quizBank.reset();
+                  recordKeeper = [];
+                  exit(0);
+                });
+              },
+              width: 120.0,
+              child: const Text(
+                'Close App',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ).show();
+      } else {
+        quizBank.checkNumber();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.blueGrey.shade900,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
-                    child: customText(
-                  message: quizBank.getQuizQuestion(),
-                )),
-              ),
-              Column(
-                children: [
-                  customButton(
-                    text: 'True',
-                    onPressed: () {
-                      setState(() {
-                        if (quizBank.getQuizAnswer()) {
-                          answerSheetIcon(Icons.check, Colors.green);
-                        } else {
-                          answerSheetIcon(Icons.close, Colors.red);
-                        }
-                        quizBank.checkNumber(context);
-                      });
-                    },
+    return Scaffold(
+      backgroundColor: Colors.blueGrey.shade900,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                  child: customText(
+                message: quizBank.getQuizQuestion(),
+              )),
+            ),
+            Column(
+              children: [
+                customButton(
+                  text: 'True',
+                  onPressed: () {
+                    checkAnswer(true);
+                  },
+                ),
+                customButton(
+                  text: 'False',
+                  color: Colors.red,
+                  onPressed: () {
+                    checkAnswer(false);
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Row(
+                    children: recordKeeper,
                   ),
-                  customButton(
-                    text: 'False',
-                    color: Colors.red,
-                    onPressed: () {
-                      setState(() {
-                        if (quizBank.getQuizAnswer()) {
-                          answerSheetIcon(Icons.close, Colors.red);
-                        } else {
-                          answerSheetIcon(Icons.check, Colors.green);
-                        }
-                        quizBank.checkNumber(context);
-                      });
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Row(
-                      children: recordKeeper,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );
