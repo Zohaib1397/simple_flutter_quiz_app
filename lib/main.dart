@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/quizBrain.dart';
+
+QuizBrain quizBank = QuizBrain();
 
 void main() {
   runApp(quiz_home());
@@ -43,20 +46,17 @@ class _quiz_homeState extends State<quiz_home> {
     );
   }
 
+  void answerSheetIcon(
+    IconData icon,
+    Color color,
+  ) {
+    recordKeeper.add(Icon(
+      icon,
+      color: color,
+    ));
+  }
+
   List<Widget> recordKeeper = [];
-  List questions = [
-    'My name is Zohaib Ahmed',
-    'Osama is a wonderful person',
-    'Moiz is the nicest person in the world',
-    'I have a Potato friend named Osama',
-  ];
-  List<bool> answers = [
-    true,
-    false,
-    true,
-    true,
-  ];
-  int currentQuestion = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -67,71 +67,47 @@ class _quiz_homeState extends State<quiz_home> {
           child: Column(
             children: [
               Expanded(
-                child: Container(
-                  child: Center(
-                      child: customText(
-                    message: questions[currentQuestion],
-                  )),
-                ),
+                child: Center(
+                    child: customText(
+                  message: quizBank.getQuizQuestion(),
+                )),
               ),
-              Container(
-                child: Column(
-                  children: [
-                    customButton(
-                      text: 'True',
-                      onPressed: () {
-                        setState(() {
-                          if (answers[currentQuestion]) {
-                            recordKeeper.add(const Icon(
-                              Icons.check,
-                              color: Colors.green,
-                            ));
-                          } else {
-                            recordKeeper.add(const Icon(
-                              Icons.close,
-                              color: Colors.red,
-                            ));
-                          }
-                          if (currentQuestion == 3) {
-                            currentQuestion = 0;
-                          } else {
-                            currentQuestion++;
-                          }
-                        });
-                      },
+              Column(
+                children: [
+                  customButton(
+                    text: 'True',
+                    onPressed: () {
+                      setState(() {
+                        if (quizBank.getQuizAnswer()) {
+                          answerSheetIcon(Icons.check, Colors.green);
+                        } else {
+                          answerSheetIcon(Icons.close, Colors.red);
+                        }
+                        quizBank.checkNumber(context);
+                      });
+                    },
+                  ),
+                  customButton(
+                    text: 'False',
+                    color: Colors.red,
+                    onPressed: () {
+                      setState(() {
+                        if (quizBank.getQuizAnswer()) {
+                          answerSheetIcon(Icons.close, Colors.red);
+                        } else {
+                          answerSheetIcon(Icons.check, Colors.green);
+                        }
+                        quizBank.checkNumber(context);
+                      });
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Row(
+                      children: recordKeeper,
                     ),
-                    customButton(
-                      text: 'False',
-                      color: Colors.red,
-                      onPressed: () {
-                        setState(() {
-                          if (answers[currentQuestion] == false) {
-                            recordKeeper.add(const Icon(
-                              Icons.check,
-                              color: Colors.green,
-                            ));
-                          } else {
-                            recordKeeper.add(const Icon(
-                              Icons.close,
-                              color: Colors.red,
-                            ));
-                          }
-                          if (currentQuestion == 3) {
-                            currentQuestion = 0;
-                          } else {
-                            currentQuestion++;
-                          }
-                        });
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Row(
-                        children: recordKeeper,
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ],
           ),
