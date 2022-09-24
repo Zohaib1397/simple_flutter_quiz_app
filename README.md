@@ -1,6 +1,7 @@
 # quiz_app
 
-This is a simple quiz app
+A simple quiz app limited to just 4 questions
+Questions can be added manually.
 
 ## Getting Started
 
